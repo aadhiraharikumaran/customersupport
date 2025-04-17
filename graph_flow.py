@@ -2,12 +2,12 @@ from typing import TypedDict
 from langgraph.graph import StateGraph, END
 from langchain_agent import run_agent
 
-# ✅ Define your state schema using TypedDict
+# ✅ Define the state schema using TypedDict
 class AgentState(TypedDict):
     message: str
     response: str
 
-# ✅ Intent classification logic
+# ✅ Intent classification node
 def classify_intent(state: AgentState) -> str:
     msg = state["message"].lower()
     if "bill" in msg or "payment" in msg or "utr" in msg:
@@ -27,9 +27,9 @@ def tech_node(state: AgentState) -> AgentState:
 def fallback_node(state: AgentState) -> AgentState:
     return {"message": state["message"], "response": "Sorry, I couldn't understand your request. Please rephrase."}
 
-# ✅ Build the LangGraph state machine
+# ✅ Graph builder function
 def build_graph():
-    graph = StateGraph(AgentState)  # 👈 This is the proper way now
+    graph = StateGraph(state_schema=AgentState)  # ✅ CORRECTED LINE
     graph.set_entry_point("classify")
 
     graph.add_node("classify", classify_intent)
