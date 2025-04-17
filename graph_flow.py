@@ -1,6 +1,12 @@
 from langgraph.graph import StateGraph, END
 from langchain_agent import run_agent
 
+# Define the shape of the state
+state_schema = {
+    "message": str,
+    "response": str
+}
+
 def classify_intent(state):
     msg = state["message"].lower()
     if "bill" in msg or "payment" in msg or "utr" in msg:
@@ -20,7 +26,7 @@ def fallback_node(state):
     return {"response": "Sorry, I couldn't understand your request. Please rephrase."}
 
 def build_graph():
-    graph = StateGraph()
+    graph = StateGraph(state_schema)  # <-- define the state schema here
     graph.set_entry_point("classify")
 
     graph.add_node("classify", classify_intent)
