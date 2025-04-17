@@ -12,5 +12,5 @@ if __name__ == "__main__":
         if user_input.lower() in ["exit", "quit"]:
             print("Goodbye! 👋")
             break
-        result = app.invoke({"message": user_input, "response": ""})  # 👈 now passes full state
+        result = app.invoke({"message": user_input, "response": ""})
         print("Bot:", result["response"])
