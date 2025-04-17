@@ -1,9 +1,13 @@
+from langchain_community.chat_models import ChatOpenAI
 from langchain.agents import Tool, initialize_agent
-from langchain.chat_models import ChatOpenAI
 from billing import billing_lookup
 from tech_support import troubleshoot_issue
+import os
 
-llm = ChatOpenAI(temperature=0)
+llm = ChatOpenAI(
+    temperature=0,
+    openai_api_key=os.getenv("OPENAI_API_KEY")
+)
 
 tools = [
     Tool(name="Billing Lookup", func=billing_lookup, description="Use for billing-related queries."),
