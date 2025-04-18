@@ -1,11 +1,10 @@
 from langgraph.graph import StateGraph
 from langchain_agent import run_agent
 
-# Define a fallback node (optional but helpful)
+# Fallback node returns dict
 def fallback_node(state):
-    return {"response": "Sorry, I couldn't process your request. Please try again or ask a different question."}
+    return {"response": "Sorry, I couldn’t process your request. Please try again later."}
 
-# Build LangGraph flow
 def build_graph():
     graph = StateGraph()
 
@@ -13,8 +12,8 @@ def build_graph():
     graph.add_node("agent", run_agent)
     graph.add_node("fallback", fallback_node)
 
-    # Define edges (simple one-step interaction)
+    # Set edges and flow
     graph.set_entry_point("agent")
-    graph.set_finish_point("agent")
+    graph.set_finish_point("agent")  # or "fallback" if you want
 
     return graph.compile()
