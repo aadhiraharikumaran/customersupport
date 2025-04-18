@@ -1,34 +1,29 @@
+from langchain.chains import LLMChain
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
 import os
 from dotenv import load_dotenv
-from langchain_community.chat_models import ChatOpenAI
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
 
-# Load .env variables
+# Load environment variables
 load_dotenv()
 
-# Load the OpenAI LLM
+# Initialize OpenAI LLM with API key
 llm = ChatOpenAI(
     temperature=0,
-    model="gpt-3.5-turbo",
     openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
-# Prompt template
-prompt = ChatPromptTemplate.from_template("""
-You are Ananya, a kind and helpful customer support assistant for Narayan Shiva Sansthan.
+# Create prompt template
+template = """You are a helpful AI assistant.
+Human: {message}
+AI:"""
 
-User query:
-{message}
+prompt = PromptTemplate.from_template(template)
 
-Answer in a helpful, friendly tone. If it's about donations, receipts, volunteering, or location, guide them.
-""")
+# Create the chain
+chain = LLMChain(llm=llm, prompt=prompt)
 
-# Chain = prompt → LLM → parser
-chain = prompt | llm | StrOutputParser()
-
-# Function for LangGraph node
 def run_agent(state):
     message = state["message"]
     response = chain.invoke({"message": message})
-    return {"response": response}
+    return {"message": message, "response": response["text"]}
