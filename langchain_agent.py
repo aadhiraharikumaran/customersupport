@@ -1,20 +1,40 @@
-from langchain_community.chat_models import ChatOpenAI
-from langchain.agents import Tool, initialize_agent
-from billing import billing_lookup
-from tech_support import troubleshoot_issue
 import os
+from dotenv import load_dotenv
+from langchain_community.chat_models import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
 
+# Load API key from .env
+load_dotenv()
+
+# 🔍 Optional debug (you can remove after testing)
+print("🔑 OpenAI API Key Loaded:", os.getenv("OPENAI_API_KEY"))
+
+# Initialize the OpenAI Chat model
 llm = ChatOpenAI(
     temperature=0,
+    model="gpt-3.5-turbo",  # or "gpt-4" if you have access
     openai_api_key=os.getenv("OPENAI_API_KEY")
 )
 
-tools = [
-    Tool(name="Billing Lookup", func=billing_lookup, description="Use for billing-related queries."),
-    Tool(name="Tech Support", func=troubleshoot_issue, description="Use for technical issues.")
-]
+# Output parser to return string results
+parser = StrOutputParser()
 
-agent = initialize_agent(tools, llm, agent="zero-shot-react-description")
+# Prompt template
+prompt = ChatPromptTemplate.from_template("""
+You are Ananya, a helpful customer support assistant.
 
-def run_agent(input_text):
-    return agent.run(input_text)
+The user query is:
+{message}
+
+Respond kindly and helpfully, addressing the concern clearly.
+""")
+
+# Define the full runnable pipeline
+chain = prompt | llm | parser
+
+# Expose a function for LangGraph to use
+def run_agent(state):
+    message = state["message"]
+    response = chain.invoke({"message": message})
+    return {"response": response}
