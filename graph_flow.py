@@ -1,17 +1,21 @@
-from langgraph.graph import StateGraph, define_state_type
+from langgraph.graph import StateGraph
+from typing import TypedDict
 from langchain_core.runnables import RunnableLambda
 from langchain_agent import run_agent
 
-# Define state schema using define_state_type
-state = define_state_type({"message": str, "response": str})
+# Define the state schema using TypedDict
+class State(TypedDict):
+    message: str
+    response: str
 
 def build_graph():
-    graph = StateGraph(state)
+    # Initialize the StateGraph with the State schema
+    graph = StateGraph(State)
 
-    # Add your agent node
+    # Add the agent node
     graph.add_node("agent", RunnableLambda(run_agent))
 
-    # Set entry and finish points
+    # Set the entry and finish points
     graph.set_entry_point("agent")
     graph.set_finish_point("agent")
 
