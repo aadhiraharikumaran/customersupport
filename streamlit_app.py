@@ -1,16 +1,18 @@
 import streamlit as st
 from graph_flow import build_graph
 
-st.title("🧠 AI Customer Support Assistant")
+st.set_page_config(page_title="AI Customer Support Assistant")
 
-# Build the graph app
+st.title("📞 AI Customer Support Assistant")
+st.write("Ask anything about donations, receipts, volunteering, and more.")
+
+# Build LangGraph app
 app = build_graph()
 
-# Get user input
-user_input = st.text_input("Enter your message:")
+# Chat input
+user_input = st.text_input("You:", "")
 
-# Handle user input
 if user_input:
-    result = app.invoke({"message": user_input, "response": ""})
-    st.markdown("**Response:**")
-    st.write(result["response"])
+    with st.spinner("Thinking..."):
+        result = app.invoke({"message": user_input})
+        st.success("Assistant: " + result["response"])
