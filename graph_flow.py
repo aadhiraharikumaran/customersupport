@@ -1,26 +1,23 @@
-from typing import TypedDict
 from langgraph.graph import StateGraph
+from langgraph.prebuilt import ToolNode
+from langchain_core.runnables import RunnableLambda
+from langchain_core.utils.state import make_state_type
 from langchain_agent import run_agent
 
-# ✅ Define the expected input/output structure
-class GraphState(TypedDict):
-    message: str
-    response: str
+# Define state type
+State = make_state_type("State", {"message": str, "response": str})
 
-# ✅ Fallback node still returns a dictionary
-def fallback_node(state: GraphState) -> GraphState:
-    return {"response": "Sorry, I couldn’t process your request. Please try again later."}
-
-# ✅ Build graph with state schema
 def build_graph():
-    graph = StateGraph(GraphState)  # <-- 🔥 this line fixes the error
+    # Create the graph
+    graph = StateGraph(State)
 
-    # Add nodes
-    graph.add_node("agent", run_agent)
-    graph.add_node("fallback", fallback_node)
+    # Define nodes
+    graph.add_node("agent", RunnableLambda(run_agent))
 
-    # Set entry and finish points
+    # Add edges
     graph.set_entry_point("agent")
-    graph.set_finish_point("agent")  # or fallback
+    graph.set_finish_point("agent")
 
-    return graph.compile()
+    # Compile to app
+    app = graph.compile()
+    return app
