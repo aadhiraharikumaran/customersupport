@@ -1,7 +1,7 @@
-langchain
-langchain-community
-openai
-langgraph
-tiktoken
 streamlit
+langchain
+langchain-core
+langgraph
+langchain-openai
+openai
 python-dotenv
